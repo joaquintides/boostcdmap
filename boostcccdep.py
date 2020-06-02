@@ -89,16 +89,26 @@ def add_dependencies_file(filename):
             break
 
 def add_dependencies_dir(path):
-  admitted_extensions={".h",".c",".hpp",".cpp",".hh",".cc",".h+",".c+",".h++",".c++"}
+  all_header_tu_filename="compiler_in.cpp"
+  admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
+  admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
+  admitted_extensions=admitted_header_extensions|admitted_code_file_extensions
   excluded_subdirs={"detail","impl"}
-  for dirpath, dirnames, filenames in os.walk(path):
-    dirnames[:]=[d for d in dirnames if d not in excluded_subdirs]
-    for filename in filenames:
-      if not os.path.splitext(filename)[1].lower() in admitted_extensions: continue
-      if verbose_mode:
-        sys.stdout.write(
-          os.path.relpath(os.path.join(dirpath,filename),boost_root_libs)+"\n")
-      add_dependencies_file(os.path.join(dirpath,filename))
+  with open(all_header_tu_filename,"w") as all_header_tu:
+    for dirpath, dirnames, filenames in os.walk(path):
+      dirnames[:]=[d for d in dirnames if d not in excluded_subdirs]
+      for filename in filenames:
+        extension=os.path.splitext(filename)[1].lower()
+        if not extension in admitted_extensions: continue
+        filename_path=os.path.join(dirpath,filename)
+        if verbose_mode:
+          sys.stdout.write(os.path.relpath(filename_path,boost_root_libs)+"\n")
+        if extension in admitted_header_extensions:
+          all_header_tu.write("#include \"{}\"\n".format(filename_path))
+        else:
+          add_dependencies_file(filename_path)
+    add_dependencies_file(all_header_tu_filename)
+  if os.path.exists(all_header_tu_filename): os.remove(all_header_tu_filename)
 
 target_module=args.module
 if not target_module in modules:
