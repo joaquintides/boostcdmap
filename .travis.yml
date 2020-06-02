@@ -20,4 +20,4 @@ install:
   - cd ..
   
 script:
-  - python boostcdmap.py
+  - python boostcdmap.py boost-root boostmincxx.$BOOST_RELEASE.json
