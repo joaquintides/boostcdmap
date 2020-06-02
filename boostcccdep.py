@@ -107,8 +107,8 @@ def add_dependencies_dir(path):
           all_header_tu.write("#include \"{}\"\n".format(filename_path))
         else:
           add_dependencies_file(filename_path)
-    add_dependencies_file(all_header_tu_filename)
-  if os.path.exists(all_header_tu_filename): os.remove(all_header_tu_filename)
+  add_dependencies_file(all_header_tu_filename)
+  os.remove(all_header_tu_filename)
 
 target_module=args.module
 if not target_module in modules:
