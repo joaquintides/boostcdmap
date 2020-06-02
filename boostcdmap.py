@@ -44,7 +44,7 @@ if not os.path.exists(mincxx_info):
 with open(mincxx_info,"r") as file:
   mincxx=json.load(file)
 
-os.system("clang++ -v")
+os.system("clang++-10 -v")
 
 ##configs=[("03","clang-linux-10~c++98.txt"),("11","clang-linux-10~c++11.txt"),
 ##         ("14","clang-linux-10~c++14.txt"),("17","clang-linux-10~c++17.txt"),
