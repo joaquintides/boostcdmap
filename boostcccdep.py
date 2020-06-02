@@ -75,7 +75,8 @@ verbose_mode=args.verbose
 dependencies=set()
 
 def add_dependencies_file(filename):
-  os.system(" ".join((compiler,"@"+compiler_cfg_filename,">"+compiler_out_filename)))
+  os.system(" ".join((
+    compiler,"@"+compiler_cfg_filename,filename,">"+compiler_out_filename)))
   with open(compiler_out_filename,"r") as compiler_out:
     pattern="^\.+ (.+)$"
     for line in compiler_out.readlines():
