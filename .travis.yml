@@ -29,4 +29,5 @@ install:
   - cd ..
   
 script:
-  - python boostcdmap.py -bboost-root boostmincxx.$BOOST_RELEASE.json
+#  - python boostcdmap.py -bboost-root boostmincxx.$BOOST_RELEASE.json
+  - python boostcccdep.py -bboost-root -std=c++11 -DBOOST_ASSUME_CXX=11 clang++ static_string
