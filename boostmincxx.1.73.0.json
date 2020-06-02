@@ -1,0 +1,20 @@
+{
+  "beast": "11", 
+  "context": "11", 
+  "contract": "11", 
+  "coroutine2": "11", 
+  "fiber": "11", 
+  "gil": "11", 
+  "hana": "14", 
+  "histogram": "14", 
+  "hof": "11", 
+  "mp11": "11", 
+  "outcome": "14", 
+  "poly_collection": "11", 
+  "process": "11", 
+  "safe_numerics": "14", 
+  "static_string": "11", 
+  "variant2": "11", 
+  "vmd": "11",
+  "yap": "14" 
+}
