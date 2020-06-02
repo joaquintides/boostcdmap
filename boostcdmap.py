@@ -44,37 +44,35 @@ if not os.path.exists(mincxx_info):
 with open(mincxx_info,"r") as file:
   mincxx=json.load(file)
 
-os.system("clang++-10 -v")
+compiler="clang++-10"
+configs=[("03","-std=c++98"),("11","-std=c++11"),("14","-std=c++14"),
+         ("17","-std=c++17"),("20","-std=c++2a")]
+report_filename="boostcccdep_out.txt"
 
-##configs=[("03","clang-linux-10~c++98.txt"),("11","clang-linux-10~c++11.txt"),
-##         ("14","clang-linux-10~c++14.txt"),("17","clang-linux-10~c++17.txt"),
-##         ("20","clang-linux-10~c++2a.txt")]
-##report_filename="boostcdep_out.txt"
-##
-##if os.system("boostcdep.py -h >nul")!=0:
-##  sys.stderr.write("Can't execute boostcdep.py\n")
-##  exit(1)
-##
-##sys.stdout.write("{\n")
-##next_module_sep=""
-##for module in modules:
-##  sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
-##  next_module_sep=",\n"
-##  next_cxx_sep=""
-##  for cxx_no,config_info in configs:
-##    if module in mincxx and int(cxx_no)<int(mincxx[module]): continue
-##    sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
-##    next_cxx_sep=",\n"
-##    if os.system(" ".join(("boostcdep.py","--boost-root","\""+boost_root+"\"",
-##                 "-DBOOST_ASSUME_CXX="+cxx_no,
-##                 "--config-info","\""+config_info+"\"",module,
-##                 ">"+report_filename)))!=0:
-##      exit(1)
-##    with open(report_filename,"r") as file:
-##      next_lib_sep=""
-##      for line in file.readlines():
-##        sys.stdout.write("{}\"{}\"".format(next_lib_sep,line.strip()))
-##        next_lib_sep=","
-##    sys.stdout.write("]")
-##  sys.stdout.write("\n  }")
-##sys.stdout.write("\n}\n")
+if os.system("python boostcccdep.py -h >nul")!=0:
+  sys.stderr.write("Can't execute boostcccdep.py\n")
+  exit(1)
+
+sys.stdout.write("{\n")
+next_module_sep=""
+for module in modules:
+  sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
+  next_module_sep=",\n"
+  next_cxx_sep=""
+  for cxx_no,std_option in configs:
+    if module in mincxx and int(cxx_no)<int(mincxx[module]): continue
+    sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
+    next_cxx_sep=",\n"
+    if os.system(" ".join((
+      "python boostcccdep.py","--boost-root","\""+boost_root+"\"",
+      "-DBOOST_ASSUME_CXX="+cxx_no,std_option,compiler,module,
+      ">"+report_filename)))!=0:
+      exit(1)
+    with open(report_filename,"r") as file:
+      next_lib_sep=""
+      for line in file.readlines():
+        sys.stdout.write("{}\"{}\"".format(next_lib_sep,line.strip()))
+        next_lib_sep=","
+    sys.stdout.write("]")
+  sys.stdout.write("\n  }")
+sys.stdout.write("\n}\n")
