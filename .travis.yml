@@ -6,7 +6,18 @@
 # See https://github.com/joaquintides/boostcdmap/ for project home page.
 
 language: python
+
 python:
   - "2.7"
-sctript:
+
+env:
+  - BOOST_RELEASE=1.73.0
+  
+install:
+  - git clone -b boost-$BOOST_RELEASE --depth 1 https://github.com/boostorg/boost.git boost-root
+  - cd boost-root
+  - git submodule update --init
+  - cd ..
+  
+script:
   - python boostcdmap.py
