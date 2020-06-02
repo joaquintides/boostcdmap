@@ -34,6 +34,7 @@ boost_root_libs=os.path.join(boost_root,"libs")
 modules=filter(
   lambda x: os.path.isdir(os.path.join(boost_root_libs,x)),
   os.listdir(boost_root_libs))
+modules.sort()
 modules.remove("headers") # fake module
 
 mincxx_info=args.mincxx_info
