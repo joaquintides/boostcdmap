@@ -66,7 +66,7 @@ def dependencies(module,cxx_no,std_option):
   return cxx_no,deps
 
 if __name__=="__main__":
-  p=multiprocessing.Pool(3*multiprocessing.cpu_count())
+  p=multiprocessing.Pool(4*multiprocessing.cpu_count())
   tasks=dict() 
   for module in modules:
     for cxx_no,std_option in configs:
