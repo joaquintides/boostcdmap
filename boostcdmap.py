@@ -53,9 +53,9 @@ if os.system("python boostcccdep.py -h >nul")!=0:
   sys.stderr.write("Can't execute boostcccdep.py\n")
   exit(1)
 
-report_filename="boostcccdep_out_{}.txt".format(os.getpid())
 
 def dependencies(module,cxx_no,std_option):
+  report_filename="boostcccdep_out_{}.txt".format(os.getpid())
   deps=[]
   if os.system(" ".join((
     "python boostcccdep.py","--boost-root","\""+boost_root+"\"",
