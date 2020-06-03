@@ -53,7 +53,6 @@ if os.system("python boostcccdep.py -h >nul")!=0:
   sys.stderr.write("Can't execute boostcccdep.py\n")
   exit(1)
 
-
 def dependencies(module,cxx_no,std_option):
   report_filename="boostcccdep_out_{}.txt".format(os.getpid())
   deps=[]
@@ -67,7 +66,7 @@ def dependencies(module,cxx_no,std_option):
   return cxx_no,deps
 
 if __name__=="__main__":
-  p=multiprocessing.Pool(multiprocessing.cpu_count())
+  p=multiprocessing.Pool(2*multiprocessing.cpu_count())
   tasks=dict() 
   for module in modules:
     for cxx_no,std_option in configs:
