@@ -63,8 +63,8 @@ compiler_cfg_filename="compiler_cfg_{}.txt".format(os.getpid())
 compiler_out_filename="compiler_out_{}.txt".format(os.getpid())
 
 with open(compiler_cfg_filename,"w") as compiler_cfg:
-  compiler_cfg.write("-E\n")
-  compiler_cfg.write("--trace-includes\n")
+  compiler_cfg.write("-M\n")
+  compiler_cfg.write("-MG\n")
   compiler_cfg.write(std_option+"\n")
   if args.symbols:
     for symbol in args.symbols: compiler_cfg.write("-D"+symbol+"\n")
@@ -73,20 +73,18 @@ with open(compiler_cfg_filename,"w") as compiler_cfg:
             
 verbose_mode=args.verbose
 dependencies=set()
-trace_include=re.compile(r"^\.+ (.+)$")
+mk_dependency=re.compile(r"[^\\ :\n]+(?:\\.[^\\ :\n]*)*")
 
 def add_dependencies_file(filename):
   os.system(" ".join((
-    compiler,"@"+compiler_cfg_filename,filename,">nul","2>"+compiler_out_filename)))
+    compiler,"@"+compiler_cfg_filename,filename,">"+compiler_out_filename,"2>nul")))
   with open(compiler_out_filename,"r") as compiler_out:
-    for line in compiler_out.readlines():
-      match=trace_include.match(line)
-      if match:
-        path=match.group(1)
-        for module in modules:
-          if os.path.commonprefix([include_path[module],path])==include_path[module]:
-            dependencies.add(module)
-            break
+    for path in mk_dependency.findall(compiler_out.read()):
+      path=path.replace("\\ "," ")
+      for module in modules:
+        if os.path.commonprefix([include_path[module],path])==include_path[module]:
+          dependencies.add(module)
+          break
 
 admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
 admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
