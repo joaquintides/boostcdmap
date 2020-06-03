@@ -89,11 +89,11 @@ def add_dependencies_file(filename):
             break
 
 def add_dependencies_dir(path):
-  all_header_tu_filename="compiler_in_{}.cpp".format(os.getpid())
   admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
   admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
   admitted_extensions=admitted_header_extensions|admitted_code_file_extensions
   excluded_subdirs={"aux_","detail","impl","preprocessed"}
+  all_header_tu_filename="compiler_in_{}.cpp".format(os.getpid())
   header_count=0
   max_header_count=20
   with open(all_header_tu_filename,"w") as all_header_tu:
