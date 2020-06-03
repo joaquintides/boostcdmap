@@ -77,10 +77,10 @@ dependencies=set()
 def add_dependencies_file(filename):
   os.system(" ".join((
     compiler,"@"+compiler_cfg_filename,filename,">nul","2>"+compiler_out_filename)))
+  pattern=re.compile(r"^\.+ (.+)$")
   with open(compiler_out_filename,"r") as compiler_out:
-    pattern="^\.+ (.+)$"
     for line in compiler_out.readlines():
-      match=re.match(pattern,line)
+      match=pattern.match(line)
       if match:
         path=match.group(1)
         for module in modules:
