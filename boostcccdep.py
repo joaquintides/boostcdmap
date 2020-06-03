@@ -73,14 +73,14 @@ with open(compiler_cfg_filename,"w") as compiler_cfg:
             
 verbose_mode=args.verbose
 dependencies=set()
-pattern=re.compile(r"^\.+ (.+)$")
+trace_include=re.compile(r"^\.+ (.+)$")
 
 def add_dependencies_file(filename):
   os.system(" ".join((
     compiler,"@"+compiler_cfg_filename,filename,">nul","2>"+compiler_out_filename)))
   with open(compiler_out_filename,"r") as compiler_out:
     for line in compiler_out.readlines():
-      match=pattern.match(line)
+      match=trace_include.match(line)
       if match:
         path=match.group(1)
         for module in modules:
