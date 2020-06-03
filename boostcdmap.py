@@ -11,6 +11,7 @@ import argparse
 import json
 import multiprocessing
 import os
+import re
 import sys
 
 parser=argparse.ArgumentParser(
@@ -32,11 +33,10 @@ if not os.path.exists(boost_root):
   sys.stderr.write("Can't find "+boost_root+"\n")
   exit(1)
 boost_root_libs=os.path.join(boost_root,"libs")
-modules=filter(
-  lambda x: os.path.isdir(os.path.join(boost_root_libs,x)),
-  os.listdir(boost_root_libs))
-modules.sort()
-modules.remove("headers") # fake module
+libs_path=re.compile(r"^\s*path\s*=*\slibs/(\S*)\s*$")
+with open(os.path.join(boost_root,".gitmodules"),"r") as gitmodules:
+  modules=sorted({
+    m.group(1) for m in map(libs_path.match,gitmodules.readlines()) if m})
 
 mincxx_info=args.mincxx_info
 if not os.path.exists(mincxx_info):
