@@ -84,7 +84,7 @@ if __name__=="__main__":
       cxx_no,deps=res.get()
       sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
       next_cxx_sep=",\n"
-      sys.stdout.write(",".join(deps))
+      sys.stdout.write(", ".join("\"{}\"".format(dep) for dep in deps))
       sys.stdout.write("]")
     sys.stdout.write("\n  }")
   sys.stdout.write("\n}\n")
