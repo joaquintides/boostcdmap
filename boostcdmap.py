@@ -80,7 +80,8 @@ if __name__=="__main__":
     sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
     next_module_sep=",\n"
     next_cxx_sep=""
-    for cxx_no,deps in [res.get() for res in tasks[module]]:
+    for res in tasks[module]:
+      cxx_no,deps=res.get()
       sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
       next_cxx_sep=",\n"
       sys.stdout.write(",".join(deps))
