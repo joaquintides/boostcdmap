@@ -79,12 +79,13 @@ def add_dependencies_file(filename):
   os.system(" ".join((
     compiler,"@"+compiler_cfg_filename,filename,">"+compiler_out_filename,"2>nul")))
   with open(compiler_out_filename,"r") as compiler_out:
-    for path in mk_dependency.findall(compiler_out.read()):
-      path=path.replace("\\ "," ")
-      for module in modules:
-        if os.path.commonprefix([include_path[module],path])==include_path[module]:
-          dependencies.add(module)
-          break
+    for line in compiler_out.readlines():
+      for path in mk_dependency.findall(line):
+        path=path.replace("\\ "," ")
+        for module in modules:
+          if os.path.commonprefix([include_path[module],path])==include_path[module]:
+            dependencies.add(module)
+            break
 
 admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
 admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
