@@ -96,7 +96,7 @@ excluded_subdirs={"aux_","detail","impl","preprocessed"}
 def add_dependencies_dir(path):
   all_header_tu_filename="compiler_in_{}.cpp".format(os.getpid())
   header_count=0
-  max_header_count=50
+  max_header_count=100
   with open(all_header_tu_filename,"w") as all_header_tu:
     for dirpath, dirnames, filenames in os.walk(path):
       dirnames[:]=[d for d in dirnames if d not in excluded_subdirs]
