@@ -94,7 +94,9 @@ def add_dependencies_dir(path):
   admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
   admitted_extensions=admitted_header_extensions|admitted_code_file_extensions
   excluded_subdirs={"detail","impl"}
-  with open(all_header_tu_filename,"w") as all_header_tu:
+  header_count=0
+  max_header_count=20
+  with open(all_header_tu_filename,"w+") as all_header_tu:
     for dirpath, dirnames, filenames in os.walk(path):
       dirnames[:]=[d for d in dirnames if d not in excluded_subdirs]
       for filename in filenames:
@@ -105,6 +107,12 @@ def add_dependencies_dir(path):
           sys.stdout.write(os.path.relpath(filename_path,boost_root_libs)+"\n")
         if extension in admitted_header_extensions:
           all_header_tu.write("#include \"{}\"\n".format(filename_path))
+          header_count+=1
+          if header_count>=max_header_count:
+            add_dependencies_file(all_header_tu_filename)
+            all_header_tu.close()
+            all_header_tu=open(all_header_tu_filename,"w+")
+            header_count=0
         else:
           add_dependencies_file(filename_path)
   add_dependencies_file(all_header_tu_filename)
