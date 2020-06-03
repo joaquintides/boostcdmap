@@ -59,17 +59,17 @@ if os.system(" ".join((compiler,"-v",">nul","2>nul")))!=0:
   sys.stderr.write("Can't execute {}\n".format(compiler))
   exit(1)
 
-compiler_cfg_filename="compiler_cfg.txt"
-compiler_out_filename="compiler_out.txt"
+compiler_cfg_filename="compiler_cfg_{}.txt".format(os.getpid())
+compiler_out_filename="compiler_out_{}.txt".format(os.getpid())
 
-with open(compiler_cfg_filename,"w") as wave_cfg:
-  wave_cfg.write("-E\n")
-  wave_cfg.write("--trace-includes\n")
-  wave_cfg.write(std_option+"\n")
+with open(compiler_cfg_filename,"w") as compiler_cfg:
+  compiler_cfg.write("-E\n")
+  compiler_cfg.write("--trace-includes\n")
+  compiler_cfg.write(std_option+"\n")
   if args.symbols:
-    for symbol in args.symbols: wave_cfg.write("-D"+symbol+"\n")
+    for symbol in args.symbols: compiler_cfg.write("-D"+symbol+"\n")
   for module in modules:
-    wave_cfg.write("-I"+include_path[module]+"\n")
+    compiler_cfg.write("-I"+include_path[module]+"\n")
             
 verbose_mode=args.verbose
 dependencies=set()
@@ -89,7 +89,7 @@ def add_dependencies_file(filename):
             break
 
 def add_dependencies_dir(path):
-  all_header_tu_filename="compiler_in.cpp"
+  all_header_tu_filename="compiler_in_{}.cpp".format(os.getpid())
   admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
   admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
   admitted_extensions=admitted_header_extensions|admitted_code_file_extensions

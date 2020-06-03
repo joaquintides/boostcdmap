@@ -9,6 +9,7 @@
 
 import argparse
 import json
+import multiprocessing
 import os
 import sys
 
@@ -47,32 +48,42 @@ with open(mincxx_info,"r") as file:
 compiler="clang++-10"
 configs=[("03","-std=c++98"),("11","-std=c++11"),("14","-std=c++14"),
          ("17","-std=c++17"),("20","-std=c++2a")]
-report_filename="boostcccdep_out.txt"
 
 if os.system("python boostcccdep.py -h >nul")!=0:
   sys.stderr.write("Can't execute boostcccdep.py\n")
   exit(1)
 
-sys.stdout.write("{\n")
-next_module_sep=""
-for module in modules:
-  sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
-  next_module_sep=",\n"
-  next_cxx_sep=""
-  for cxx_no,std_option in configs:
-    if module in mincxx and int(cxx_no)<int(mincxx[module]): continue
-    sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
-    next_cxx_sep=",\n"
-    if os.system(" ".join((
-      "python boostcccdep.py","--boost-root","\""+boost_root+"\"",
-      "-DBOOST_ASSUME_CXX="+cxx_no,std_option,compiler,module,
-      ">"+report_filename)))!=0:
-      exit(1)
+def dependencies(module,cxx_no,std_option):
+  report_filename="boostcccdep_out_{}.txt".format(os.getpid())
+  deps=[]
+  if os.system(" ".join((
+    "python boostcccdep.py","--boost-root","\""+boost_root+"\"",
+    "-DBOOST_ASSUME_CXX="+cxx_no,std_option,compiler,module,
+    ">"+report_filename)))==0:
     with open(report_filename,"r") as file:
-      next_lib_sep=""
-      for line in file.readlines():
-        sys.stdout.write("{}\"{}\"".format(next_lib_sep,line.strip()))
-        next_lib_sep=","
-    sys.stdout.write("]")
-  sys.stdout.write("\n  }")
-sys.stdout.write("\n}\n")
+      for line in file.readlines():res.append(line.strip())
+  os.remove(report_filename)
+  return cxx_no,deps
+
+if __name__=='__main__':
+  p=multiprocessing.Pool(multiprocessing.cpu_count())
+  tasks=dict() 
+  for module in modules:
+    for cxx_no,std_option in configs:
+      if module in mincxx and int(cxx_no)<int(mincxx[module]): continue
+      tasks.setdefault(module,[]).append(
+        p.apply_async(dependencies,(module,cxx_no,std_option)))
+
+  sys.stdout.write("{\n")
+  next_module_sep=""
+  for module in modules:
+    sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
+    next_module_sep=",\n"
+    next_cxx_sep=""
+    for cxx_no,deps in [res.get() for res in tasks[module]]:
+      sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
+      next_cxx_sep=",\n"
+      sys.stdout.write(",".join(deps))
+      sys.stdout.write("]")
+    sys.stdout.write("\n  }")
+  sys.stdout.write("\n}\n")
