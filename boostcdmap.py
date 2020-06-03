@@ -61,11 +61,11 @@ def dependencies(module,cxx_no,std_option):
     "-DBOOST_ASSUME_CXX="+cxx_no,std_option,compiler,module,
     ">"+report_filename)))==0:
     with open(report_filename,"r") as file:
-      for line in file.readlines():res.append(line.strip())
+      for line in file.readlines():deps.append(line.strip())
   os.remove(report_filename)
   return cxx_no,deps
 
-if __name__=='__main__':
+if __name__=="__main__":
   p=multiprocessing.Pool(multiprocessing.cpu_count())
   tasks=dict() 
   for module in modules:
