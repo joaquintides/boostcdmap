@@ -53,9 +53,9 @@ header_dependencies={module:dict() for module in modules}
 source_dependencies={module:dict() for module in modules}
 dependencies_to_expand={module:dict() for module in modules}
 
-#if os.system("python boostccdep.py -h >nul")!=0:
-#  sys.stderr.write("Can't execute boostccdep.py\n")
-#  exit(1)
+if os.system("python boostccdep.py -h >nul")!=0:
+  sys.stderr.write("Can't execute boostccdep.py\n")
+  exit(1)
 
 def scan_dependencies(module,cxx_no,std_option):
   header_section=re.compile(r"^\s*From headers:\s*$")
