@@ -8,7 +8,6 @@
 # See https://github.com/joaquintides/boostcdmap/ for project home page.
 
 import argparse
-import copy
 import json
 import multiprocessing
 import os
@@ -74,14 +73,14 @@ def scan_dependencies(module,cxx_no,std_option):
         elif source_section.match(line): deps=source_deps
         elif deps!=None: deps.add(line.strip())
   os.remove(report_filename)
-  return header_deps,source_deps,copy.deepcopy(source_deps)
+  return header_deps,source_deps,set(source_deps)
 
 def total_source_dependencies(module,cxx_no,cyclic_deps=set()):
   source_deps=source_dependencies[module][cxx_no]
   deps_to_expand=dependencies_to_expand[module][cxx_no]
   if deps_to_expand:
-    cyclic_deps=copy.deepcopy(cyclic_deps).update(module)
-    for dep in copy.deepcopy(deps_to_expand).difference(cyclic_deps):
+    cyclic_deps=cyclic_deps|{module}
+    for dep in deps_to_expand-cyclic_deps:
       source_deps.update(total_source_dependencies(dep,cxx_no,cyclic_deps))
       deps_to_expand.remove(dep)
   return source_deps
