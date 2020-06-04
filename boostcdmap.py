@@ -76,7 +76,7 @@ def scan_dependencies(module,cxx_no,std_option):
   os.remove(report_filename)
   return header_deps,source_deps,copy.deepcopy(source_deps)
 
-def total_source_dependencies(module,cxx_no,cyclic_deps={}):
+def total_source_dependencies(module,cxx_no,cyclic_deps=set()):
   source_deps=source_dependencies[module][cxx_no]
   deps_to_expand=dependencies_to_expand[module][cxx_no]
   if deps_to_expand:
