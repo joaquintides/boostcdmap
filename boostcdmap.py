@@ -55,6 +55,7 @@ if os.system("python boostccdep.py -h >nul")!=0:
 
 header_section=re.compile(r"^\s*From headers:\s*$")
 source_section=re.compile(r"^\s*From sources:\s*$")
+
 def dependencies(module,cxx_no,std_option):
   report_filename="boostccdep_out_{}.txt".format(os.getpid())
   header_deps=[]
@@ -66,10 +67,9 @@ def dependencies(module,cxx_no,std_option):
     ">"+report_filename)))==0:
     with open(report_filename,"r") as file:
       for line in file.readlines():
-        sys.stdout.write(line)
         if header_section.match(line): deps=header_deps
         elif source_section.match(line): deps=source_deps
-        elif deps: deps.append(line.strip())
+        elif deps!=None: deps.append(line.strip())
   os.remove(report_filename)
   return cxx_no,header_deps+source_deps
 
