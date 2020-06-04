@@ -53,8 +53,8 @@ if os.system("python boostccdep.py -h >nul")!=0:
   sys.stderr.write("Can't execute boostccdep.py\n")
   exit(1)
 
-header_section=re.compile(r"^From headers:$")
-source_section=re.compile(r"^From sources:$")
+header_section=re.compile(r"^\s*From headers:\s*$")
+source_section=re.compile(r"^\s*From sources:\s*$")
 def dependencies(module,cxx_no,std_option):
   report_filename="boostccdep_out_{}.txt".format(os.getpid())
   header_deps=[]
