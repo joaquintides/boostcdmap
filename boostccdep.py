@@ -1,4 +1,4 @@
-# boostcccdep: Boost conditional dependency calculator based
+# boostccdep: Boost conditional dependency calculator based
 # on a compiler driver
 #
 # Copyright 2020 Joaquin M Lopez Munoz.

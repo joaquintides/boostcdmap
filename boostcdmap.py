@@ -49,15 +49,15 @@ compiler="clang++-10"
 configs=[("03","-std=c++98"),("11","-std=c++11"),("14","-std=c++14"),
          ("17","-std=c++17"),("20","-std=c++2a")]
 
-if os.system("python boostcccdep.py -h >nul")!=0:
-  sys.stderr.write("Can't execute boostcccdep.py\n")
+if os.system("python boostccdep.py -h >nul")!=0:
+  sys.stderr.write("Can't execute boostccdep.py\n")
   exit(1)
 
 def dependencies(module,cxx_no,std_option):
-  report_filename="boostcccdep_out_{}.txt".format(os.getpid())
+  report_filename="boostccdep_out_{}.txt".format(os.getpid())
   deps=[]
   if os.system(" ".join((
-    "python boostcccdep.py","--boost-root","\""+boost_root+"\"",
+    "python boostccdep.py","--boost-root","\""+boost_root+"\"",
     "-DBOOST_ASSUME_CXX="+cxx_no,std_option,compiler,module,
     ">"+report_filename)))==0:
     with open(report_filename,"r") as file:
