@@ -77,7 +77,8 @@ mk_dependency=re.compile(r"[^\\ :\n]+(?:\\.[^\\ :\n]*)*")
 
 def add_dependencies_file(filename):
   os.system(" ".join((
-    compiler,"@"+compiler_cfg_filename,filename,">"+compiler_out_filename,"2>nul")))
+    compiler,"@"+compiler_cfg_filename,"\""+filename"\"",
+    ">"+compiler_out_filename,"2>nul")))
   with open(compiler_out_filename,"r") as compiler_out:
     for line in compiler_out.readlines():
       for path in mk_dependency.findall(line):
