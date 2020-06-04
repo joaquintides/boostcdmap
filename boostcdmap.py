@@ -61,8 +61,8 @@ def scan_dependencies(module,cxx_no,std_option):
   header_section=re.compile(r"^\s*From headers:\s*$")
   source_section=re.compile(r"^\s*From sources:\s*$")
   report_filename="boostccdep_out_{}.txt".format(os.getpid())
-  header_deps=[]
-  source_deps=[]
+  header_deps=set()
+  source_deps=set()
   deps=None
   if os.system(" ".join((
     "python boostccdep.py","--boost-root","\""+boost_root+"\"",
@@ -72,14 +72,23 @@ def scan_dependencies(module,cxx_no,std_option):
       for line in file.readlines():
         if header_section.match(line): deps=header_deps
         elif source_section.match(line): deps=source_deps
-        elif deps!=None: deps.append(line.strip())
+        elif deps!=None: deps.add(line.strip())
   os.remove(report_filename)
   return header_deps,source_deps,copy.deepcopy(source_deps)
 
-def total_dependencies(module,cxx_no):
-  # need to expand
-  return sorted(set(
-    header_dependencies[module][cxx_no]+source_dependencies[module][cxx_no]))
+def total_source_dependencies(module,cxx_no,cyclic_deps={}):
+  source_deps=source_dependencies[module][cxx_no]
+  deps_to_expand=dependencies_to_expand[module][cxx_no]
+  if deps_to_expand:
+    cyclic_deps=copy.deepcopy(cyclic_deps).update(module)
+    for dep in copy.deepcopy(deps_to_expand).difference(cyclic_deps):
+      source_deps.update(total_source_dependencies(dep,cxx_no,cyclic_deps))
+      deps_to_expand.remove(dep)
+  return source_deps
+
+def dependency_list(module,cxx_no):
+  return sorted(
+    header_dependencies[module][cxx_no]|total_source_dependencies(module,cxx_no))
 
 if __name__=="__main__":
   p=multiprocessing.Pool(3*multiprocessing.cpu_count())
@@ -112,7 +121,7 @@ if __name__=="__main__":
       sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
       next_cxx_sep=",\n"
       sys.stdout.write(", ".join("\"{}\"".format(dep)
-                                 for dep in total_dependencies(module,cxx_no)))
+                                 for dep in dependency_list(module,cxx_no)))
       sys.stdout.write("]")
     sys.stdout.write("\n  }")
   sys.stdout.write("\n}\n")
