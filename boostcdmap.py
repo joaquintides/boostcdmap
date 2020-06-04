@@ -8,6 +8,7 @@
 # See https://github.com/joaquintides/boostcdmap/ for project home page.
 
 import argparse
+import copy
 import json
 import multiprocessing
 import os
@@ -48,15 +49,17 @@ with open(mincxx_info,"r") as file:
 compiler="clang++-10"
 configs=[("03","-std=c++98"),("11","-std=c++11"),("14","-std=c++14"),
          ("17","-std=c++17"),("20","-std=c++2a")]
+header_dependencies={module:dict() for module in modules}
+source_dependencies={module:dict() for module in modules}
+dependencies_to_expand={module:dict() for module in modules}
 
-if os.system("python boostccdep.py -h >nul")!=0:
-  sys.stderr.write("Can't execute boostccdep.py\n")
-  exit(1)
+#if os.system("python boostccdep.py -h >nul")!=0:
+#  sys.stderr.write("Can't execute boostccdep.py\n")
+#  exit(1)
 
-header_section=re.compile(r"^\s*From headers:\s*$")
-source_section=re.compile(r"^\s*From sources:\s*$")
-
-def dependencies(module,cxx_no,std_option):
+def scan_dependencies(module,cxx_no,std_option):
+  header_section=re.compile(r"^\s*From headers:\s*$")
+  source_section=re.compile(r"^\s*From sources:\s*$")
   report_filename="boostccdep_out_{}.txt".format(os.getpid())
   header_deps=[]
   source_deps=[]
@@ -71,28 +74,44 @@ def dependencies(module,cxx_no,std_option):
         elif source_section.match(line): deps=source_deps
         elif deps!=None: deps.append(line.strip())
   os.remove(report_filename)
-  return cxx_no,header_deps+source_deps
+  return header_deps,source_deps,copy.deepcopy(source_deps)
+
+def total_dependencies(module,cxx_no):
+  # need to expand
+  return sorted(set(
+    header_dependencies[module][cxx_no]+source_dependencies[module][cxx_no]))
 
 if __name__=="__main__":
   p=multiprocessing.Pool(3*multiprocessing.cpu_count())
-  tasks=dict() 
+  tasks=dict()
   for module in modules:
     for cxx_no,std_option in configs:
       if module in mincxx and int(cxx_no)<int(mincxx[module]): continue
       tasks.setdefault(module,[]).append(
-        p.apply_async(dependencies,(module,cxx_no,std_option)))
+        (cxx_no,p.apply_async(scan_dependencies,(module,cxx_no,std_option))))
 
-  sys.stdout.write("{\n")
+  sys.stderr.write("Scanning dependencies...\n")
+  for module in modules:
+    next_cxx_sep=""
+    sys.stderr.write("{}: ".format(module))
+    for cxx_no,async_result in tasks[module]:
+      sys.stderr.write("{}{}".format(next_cxx_sep,cxx_no))
+      next_cxx_sep=", "
+      ( header_dependencies[module][cxx_no],
+        source_dependencies[module][cxx_no],
+        dependencies_to_expand[module][cxx_no] )=async_result.get()
+    sys.stderr.write("\n")
+
   next_module_sep=""
   for module in modules:
     sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
     next_module_sep=",\n"
     next_cxx_sep=""
-    for res in tasks[module]:
-      cxx_no,deps=res.get()
+    for cxx_no,_ in tasks[module]:
       sys.stdout.write("{}    \"{}\": [".format(next_cxx_sep,cxx_no))
       next_cxx_sep=",\n"
-      sys.stdout.write(", ".join("\"{}\"".format(dep) for dep in deps))
+      sys.stdout.write(", ".join("\"{}\"".format(dep)
+                                 for dep in total_dependencies(module,cxx_no)))
       sys.stdout.write("]")
     sys.stdout.write("\n  }")
   sys.stdout.write("\n}\n")
