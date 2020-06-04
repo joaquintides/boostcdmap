@@ -29,4 +29,5 @@ install:
   - cd ..
   
 script:
+  - python boostccdp.py -bboost-root -std=c++98 clang++-10 beast
   - python boostcdmap.py -bboost-root boostmincxx.$BOOST_RELEASE.json
