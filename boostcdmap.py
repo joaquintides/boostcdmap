@@ -53,17 +53,24 @@ if os.system("python boostccdep.py -h >nul")!=0:
   sys.stderr.write("Can't execute boostccdep.py\n")
   exit(1)
 
+header_section=re.compile(r"^From headers:$")
+source_section=re.compile(r"^From sources:$")
 def dependencies(module,cxx_no,std_option):
   report_filename="boostccdep_out_{}.txt".format(os.getpid())
-  deps=[]
+  header_deps=[]
+  source_deps=[]
+  deps=None
   if os.system(" ".join((
     "python boostccdep.py","--boost-root","\""+boost_root+"\"",
     "-DBOOST_ASSUME_CXX="+cxx_no,std_option,compiler,module,
     ">"+report_filename)))==0:
     with open(report_filename,"r") as file:
-      for line in file.readlines():deps.append(line.strip())
+      for line in file.readlines():
+        if header_section.match(line): deps=header_deps
+        elif source_section.match(line): deps=source_deps
+        elif deps: deps.append(line.strip())
   os.remove(report_filename)
-  return cxx_no,deps
+  return cxx_no,header_deps+source_deps
 
 if __name__=="__main__":
   p=multiprocessing.Pool(3*multiprocessing.cpu_count())

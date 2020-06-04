@@ -72,10 +72,11 @@ with open(compiler_cfg_filename,"w") as compiler_cfg:
     compiler_cfg.write("-I"+include_path[module]+"\n")
             
 verbose_mode=args.verbose
-dependencies=set()
+header_dependencies=set()
+source_dependencies=set()
 mk_dependency=re.compile(r"[^\\ :\n]+(?:\\.[^\\ :\n]*)*")
 
-def add_dependencies_file(filename):
+def add_dependencies(filename,deps):
   os.system(" ".join((
     compiler,"@"+compiler_cfg_filename,"\""+filename+"\"",
     ">"+compiler_out_filename,"2>nul")))
@@ -85,8 +86,14 @@ def add_dependencies_file(filename):
         path=path.replace("\\ "," ")
         for module in modules:
           if os.path.commonprefix([include_path[module],path])==include_path[module]:
-            dependencies.add(module)
+            deps.add(module)
             break
+
+def add_header_dependencies(filename):
+  add_dependencies(filename,header_dependencies)
+
+def add_source_dependencies(filename):
+  add_dependencies(filename,source_dependencies)
 
 admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
 admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
@@ -111,12 +118,12 @@ def add_dependencies_dir(path):
           header_count+=1
           if header_count>=max_header_count:
             all_header_tu.close()
-            add_dependencies_file(all_header_tu_filename)
+            add_header_dependencies(all_header_tu_filename)
             all_header_tu=open(all_header_tu_filename,"w")
             header_count=0
         else:
-          add_dependencies_file(filename_path)
-  add_dependencies_file(all_header_tu_filename)
+          add_source_dependencies(filename_path)
+  add_header_dependencies(all_header_tu_filename)
   os.remove(all_header_tu_filename)
 
 target_module=args.module
@@ -129,7 +136,10 @@ add_dependencies_dir(os.path.join(include_path[target_module]))
 add_dependencies_dir(os.path.join(src_path[target_module]))
 dependencies.discard(target_module)
 if verbose_mode: sys.stdout.write("Dependencies for module "+target_module+":\n")
-for module in sorted(dependencies): sys.stdout.write(module+"\n")
+sys.stdout.write("From headers:\n)
+for module in sorted(header_dependencies): sys.stdout.write(module+"\n")
+sys.stdout.write("From sources:\n)
+for module in sorted(source_dependencies): sys.stdout.write(module+"\n")
 if os.path.exists(compiler_out_filename): os.remove(compiler_out_filename)
 if os.path.exists(compiler_cfg_filename): os.remove(compiler_cfg_filename)
 
