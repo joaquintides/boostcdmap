@@ -102,6 +102,7 @@ if __name__=="__main__":
         dependencies_to_expand[module][cxx_no] )=async_result.get()
     sys.stderr.write("\n")
 
+  sys.stdout.write("{\n")
   next_module_sep=""
   for module in modules:
     sys.stdout.write("{}  \"{}\": {{\n".format(next_module_sep,module))
