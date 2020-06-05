@@ -42,8 +42,7 @@ mincxx_info=args.mincxx_info
 if not os.path.exists(mincxx_info):
   sys.stderr.write("Can't find "+mincxx_info+"\n")
   exit(1)
-with open(mincxx_info,"r") as file:
-  mincxx=json.load(file)
+with open(mincxx_info,"r") as file: mincxx=json.load(file)
 
 compiler="clang++-10"
 configs=[("03","-std=c++98"),("11","-std=c++11"),("14","-std=c++14"),
@@ -100,8 +99,8 @@ if __name__=="__main__":
 
   sys.stderr.write("Scanning dependencies...\n")
   for module in modules:
-    next_cxx_sep=""
     sys.stderr.write("{}: ".format(module))
+    next_cxx_sep=""
     for cxx_no,async_result in tasks[module]:
       sys.stderr.write("{}{}".format(next_cxx_sep,cxx_no))
       next_cxx_sep=", "

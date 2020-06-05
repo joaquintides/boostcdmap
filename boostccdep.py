@@ -96,8 +96,8 @@ def add_source_dependencies(filename):
   add_dependencies(filename,source_dependencies)
 
 admitted_header_extensions={".h",".hpp",".hh",".h+",".h++"}
-admitted_code_file_extensions={".c",".cpp",".cc",".c+",".c++"}
-admitted_extensions=admitted_header_extensions|admitted_code_file_extensions
+admitted_source_extensions={".c",".cpp",".cc",".c+",".c++"}
+admitted_extensions=admitted_header_extensions|admitted_source_extensions
 excluded_subdirs={"aux_","detail","impl","preprocessed"}
 
 def add_dependencies_dir(path):
@@ -136,11 +136,12 @@ add_dependencies_dir(os.path.join(include_path[target_module]))
 add_dependencies_dir(os.path.join(src_path[target_module]))
 header_dependencies.discard(target_module)
 source_dependencies.discard(target_module)
-if verbose_mode: sys.stdout.write("Dependencies for module "+target_module+":\n")
-sys.stdout.write("From headers:\n")
-for module in sorted(header_dependencies): sys.stdout.write(module+"\n")
-sys.stdout.write("From sources:\n")
-for module in sorted(source_dependencies): sys.stdout.write(module+"\n")
+if verbose_mode: sys.stdout.write("Dependencies for module {}:\n".format(target_module))
+if header_dependencies:
+  sys.stdout.write("From headers:\n")
+  for module in sorted(header_dependencies): sys.stdout.write(module+"\n")
+if source_dependencies:
+  sys.stdout.write("From sources:\n")
+  for module in sorted(source_dependencies): sys.stdout.write(module+"\n")
 if os.path.exists(compiler_out_filename): os.remove(compiler_out_filename)
 if os.path.exists(compiler_cfg_filename): os.remove(compiler_cfg_filename)
-
