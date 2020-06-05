@@ -334,13 +334,6 @@
     "17": ["config", "core", "fusion", "mpl", "preprocessor", "static_assert", "tuple", "type_traits", "utility"],
     "20": ["config", "core", "fusion", "mpl", "preprocessor", "static_assert", "tuple", "type_traits", "utility"]
   },
-  "headers": {
-    "03": [],
-    "11": [],
-    "14": [],
-    "17": [],
-    "20": []
-  },
   "heap": {
     "03": ["array", "assert", "bind", "concept_check", "config", "container_hash", "core", "detail", "function", "integer", "intrusive", "iterator", "move", "mpl", "parameter", "preprocessor", "static_assert", "throw_exception", "type_index", "type_traits", "utility"],
     "11": ["array", "assert", "bind", "concept_check", "config", "core", "detail", "intrusive", "iterator", "move", "mp11", "mpl", "parameter", "preprocessor", "static_assert", "throw_exception", "type_traits", "utility"],
