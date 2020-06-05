@@ -29,7 +29,7 @@ parser.add_argument(
 parser.add_argument(
   "-v","--verbose",action="store_true",help="verbose mode")
 parser.add_argument(
-  "compiler",metavar="<compiler>",help="compiler command name (vg. compiler++)")
+  "compiler",metavar="<compiler>",help="compiler command name (vg. clang++)")
 parser.add_argument(
   "module",metavar="<module>",help="Boost module name")
 args=parser.parse_args()
