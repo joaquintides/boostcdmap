@@ -20,7 +20,7 @@ Calculated dependencies are in general fewer than those listed in the
 [Boost dependency report](https://pdimov.github.io/boostdep-report/) (including
 primary and secondary dependencies): this is so because `boostcdmap`/`boostccdep`
 recognizes conditional header inclusion based on environment macros (such as
-those of Boost.Config).
+those of **Boost.Config**).
 
 [Full map generation](.travis.yml) takes around 35 min on a regular (as of 2020) Travis Ubuntu box.
 
@@ -80,7 +80,7 @@ optional arguments:
 ```
 **&lt;mincxx-info-file&gt;**
 
-JSON files indicating the minimum C++ standard version required for each Boost module.
+JSON file indicating the minimum C++ standard version required for each Boost module.
 If a module does not appear, C++03 compatibility is assumed. Look at
 [`boostmincxx.1.73.0.json`](boostmincxx.1.73.0.json) for an example of such file.
 
