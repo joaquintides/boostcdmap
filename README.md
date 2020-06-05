@@ -1,7 +1,7 @@
 # Boost condicional dependency map
 
 Part of the [Boost epoch proposal](https://github.com/joaquintides/boost_epoch/).
-The tool [`boostcdmap`](#boostcdmap) has been to used to generate a [`boostcdmap.1.73.0.json`](boostcdmap.1.73.0.json)
+The tool [`boostcdmap`](#boostcdmap) has been used to generate a [`boostcdmap.1.73.0.json`](boostcdmap.1.73.0.json)
 file describing the internal dependencies of every Boost module for epochs **Boost03** to
 **Boost20**.
 
