@@ -37,6 +37,7 @@ libs_path=re.compile(r"^\s*path\s*=*\slibs/(\S*)\s*$")
 with open(os.path.join(boost_root,".gitmodules"),"r") as gitmodules:
   modules=sorted({
     m.group(1) for m in map(libs_path.match,gitmodules.readlines()) if m})
+modules.remove("headers") # fake module
 
 mincxx_info=args.mincxx_info
 if not os.path.exists(mincxx_info):
