@@ -14,7 +14,7 @@ using Clang preprocessor with configurable values of `BOOST_ASSUME_CXX` and `-st
 * [`boostcdmap`](#boostcdmap) reads the mininum C++ standard version requirements
 of Boost modules from [`boostmincxx.1.73.0.json`](boostmincxx.1.73.0.json) and uses
 `boostccdep` to scan the dependencies of each module for its supported epoch
-confgurations.
+configurations.
 
 Calculated dependencies are in general fewer than those listed in the
 [Boost dependency report](https://pdimov.github.io/boostdep-report/) (including
